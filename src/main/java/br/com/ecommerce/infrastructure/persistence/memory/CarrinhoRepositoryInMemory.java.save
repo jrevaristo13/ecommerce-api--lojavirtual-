@@ -1,0 +1,66 @@
+cd ~/Área\ de\ trabalho/E-commerce/lojavirtual
+
+cat > src/main/java/br/com/ecommerce/infrastructure/persistence/memory/CarrinhoRepositoryInMemory.java << 'EOF'
+package br.com.ecommerce.infrastructure.persistence.memory;
+
+import br.com.ecommerce.application.repository.CarrinhoRepository;
+import br.com.ecommerce.domain.Carrinho;
+import org.springframework.stereotype.Repository;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Repository
+public class CarrinhoRepositoryInMemory implements CarrinhoRepository {
+
+    private final Map<UUID, Carrinho> carrinhos = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<Carrinho> buscarPorClienteId(UUID clienteId) {
+        return Optional.ofNullable(carrinhos.get(clienteId));
+    }
+
+    @Override
+    public void salvar(Carrinho carrinho) {
+        carrinhos.put(carrinho.getClienteId(), carrinho);
+    }
+
+    @Override
+    public void limpar(UUID clienteId) {
+        carrinhos.remove(clienteId);
+    }
+}
+
+package br.com.ecommerce.infrastructure.persistence.memory;
+
+import br.com.ecommerce.application.repository.CarrinhoRepository;
+import br.com.ecommerce.domain.Carrinho;
+import org.springframework.stereotype.Repository;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Repository
+public class CarrinhoRepositoryInMemory implements CarrinhoRepository {
+
+    private final Map<UUID, Carrinho> carrinhos = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<Carrinho> buscarPorClienteId(UUID clienteId) {
+        return Optional.ofNullable(carrinhos.get(clienteId));
+    }
+
+    @Override
+    public void salvar(Carrinho carrinho) {
+        carrinhos.put(carrinho.getClienteId(), carrinho);
+    }
+
+    @Override
+    public void limpar(UUID clienteId) {
+        carrinhos.remove(clienteId);
+    }
+}

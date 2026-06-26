@@ -1,0 +1,87 @@
+package br.com.ecommerce.domain;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+public class Pedido {
+
+    private static final RoundingMode ARREDONDAMENTO = RoundingMode.HALF_EVEN;
+
+    private final UUID id;
+    private final String cliente; // Nome ou identificação do cliente
+    private final List<ItemPedido> itens;
+    private StatusPedido status;
+    private BigDecimal valorTotal;
+    private final LocalDateTime dataCriacao;
+
+    // ========================================== 
+    //       CONSTRUTOR PRINCIPAL (CRIAÇÃO)
+    // ==========================================
+    public Pedido(String cliente) {
+        this.id = UUID.randomUUID();
+        this.cliente = Objects.requireNonNull(cliente, "O cliente não pode ser nulo.");
+        this.itens = new ArrayList<>();
+        this.status = StatusPedido.AGUARDANDO_PAGAMENTO; // Todo pedido nasce aguardando pix/cartão
+        this.valorTotal = BigDecimal.ZERO.setScale(2, ARREDONDAMENTO);
+        this.dataCriacao = LocalDateTime.now();
+    }
+
+    // ==========================================
+    //        COMPORTAMENTOS DE NEGÓCIO
+    // ==========================================
+
+    /**
+     * Adiciona um item ao pedido e atualiza o valor total geral automaticamente.
+     * Este é o método que o FecharPedidoUseCase chama!
+     */
+    public void adicionarItem(ItemPedido novoItem) {
+        Objects.requireNonNull(novoItem, "O item do pedido não pode ser nulo.");
+        
+        // Se o item já existir (mesmo produto), soma a quantidade
+        if (this.itens.contains(novoItem)) {
+            ItemPedido existente = this.itens.get(this.itens.indexOf(novoItem));
+            existente.adicionarQuantidade(novoItem.getQuantidade());
+        } else {
+            this.itens.add(novoItem);
+        }
+        
+        recalcularValorTotal();
+    }
+
+    public void pagar() {
+        if (this.status != StatusPedido.AGUARDANDO_PAGAMENTO) {
+            throw new IllegalStateException("Apenas pedidos aguardando pagamento podem ser pagos.");
+        }
+        this.status = StatusPedido.PAGO;
+    }
+
+    public void cancelar() {
+        if (this.status == StatusPedido.ENTREGUE) {
+            throw new IllegalStateException("Não é possível cancelar um pedido que já foi entregue.");
+        }
+        this.status = StatusPedido.CANCELADO;
+    }
+
+    private void recalcularValorTotal() {
+        this.valorTotal = this.itens.stream()
+                .map(ItemPedido::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, ARREDONDAMENTO);
+    }
+
+    // ==========================================
+    //                 GETTERS
+    // ==========================================
+    public UUID getId() { return id; }
+    public String getCliente() { return cliente; }
+    public List<ItemPedido> getItens() { return Collections.unmodifiableList(itens); }
+    public StatusPedido getStatus() { return status; }
+    public BigDecimal getValorTotal() { return valorTotal; }
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+}

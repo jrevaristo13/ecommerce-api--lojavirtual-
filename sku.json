@@ -1,0 +1,13 @@
+{
+    "produtoId": "550e8400-e29b-41d4-a716-446655440000",
+    "codigoSku": "CAMISA-001",
+    "nomeVariacao": "Camisa Azul M",
+    "preco": 99.90,
+    "quantidadeEstoque": 50,
+    "dimensao": {
+        "altura": 10.0,
+        "largura": 20.0,
+        "profundidade": 30.0,
+        "peso": 0.500
+    }
+}
