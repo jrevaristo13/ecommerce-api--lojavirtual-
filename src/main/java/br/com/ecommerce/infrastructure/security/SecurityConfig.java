@@ -2,6 +2,7 @@ package br.com.ecommerce.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -40,6 +41,15 @@ public class SecurityConfig {
                         
                         // Swagger/OpenAPI
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+                        
+                        // ✅ Permitir GET em /produtos sem autenticação
+                        .requestMatchers(HttpMethod.GET, "/produtos", "/produtos/**").permitAll()
+                        
+                        // ✅ Permitir GET em /skus sem autenticação
+                        .requestMatchers(HttpMethod.GET, "/skus", "/skus/**").permitAll()
+                        
+                        // ✅ Permitir GET em /marcas sem autenticação
+                        .requestMatchers(HttpMethod.GET, "/marcas", "/marcas/**").permitAll()
                         
                         // Qualquer outra requisição precisa de autenticação
                         .anyRequest().authenticated()
