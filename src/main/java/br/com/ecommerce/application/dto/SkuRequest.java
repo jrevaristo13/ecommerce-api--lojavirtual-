@@ -1,25 +1,51 @@
 package br.com.ecommerce.application.dto;
 
-import jakarta.validation.constraints.*; // IMPORTANTE: Use jakarta
+import br.com.ecommerce.domain.Dimensao;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
-import br.com.ecommerce.domain.Dimensao;
 
 public record SkuRequest(
-    @NotNull(message = "ID do produto é obrigatório")
+    @NotNull(message = "Produto ID é obrigatório")
     UUID produtoId,
-
-    @NotBlank(message = "Código é obrigatório")
+    
+    @NotBlank(message = "Código SKU é obrigatório")
     String codigoSku,
-
-    @NotBlank(message = "Nome é obrigatório")
+    
+    @NotBlank(message = "Nome da variação é obrigatório")
     String nomeVariacao,
-
-    @DecimalMin(value = "0.01", message = "Preço deve ser maior que zero")
+    
+    @NotNull(message = "Preço é obrigatório")
+    @Positive(message = "Preço deve ser positivo")
     BigDecimal preco,
-
-    @Min(value = 0, message = "Estoque não pode ser negativo")
-    int quantidadeEstoque,
-
-    Dimensao dimensao
-) {}
+    
+    @NotNull(message = "Quantidade em estoque é obrigatória")
+    @Min(value = 0, message = "Quantidade em estoque não pode ser negativa")
+    Integer quantidadeEstoque,
+    
+    Boolean ativo,
+    
+    DimensaoRequest dimensao
+) {
+    public record DimensaoRequest(
+        Double peso,
+        Double altura,
+        Double largura,
+        Double comprimento
+    ) {
+        public Dimensao toDimensao() {
+            if (peso == null || altura == null || largura == null || comprimento == null) {
+                return null;
+            }
+            return new Dimensao(
+                BigDecimal.valueOf(peso),
+                BigDecimal.valueOf(altura),
+                BigDecimal.valueOf(largura),
+                BigDecimal.valueOf(comprimento)
+            );
+        }
+    }
+}

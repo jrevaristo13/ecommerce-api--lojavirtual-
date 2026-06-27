@@ -41,7 +41,7 @@ public class SkuController {
     request.preco(),
     request.quantidadeEstoque(),
     true, // <--- ADICIONE ESTE PARÂMETRO
-    request.dimensao()
+    request.dimensao() != null ? request.dimensao().toDimensao() : null
 );
         
         criarSkuUseCase.executar(sku);
